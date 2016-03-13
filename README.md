@@ -36,3 +36,7 @@ from. Where it comes from is an implementation detail of a Repository implementa
 
 The directory structure is such that the intent of the application is front and center, not the frameworks
 involved in creating the application.
+
+## Implementation Details
+
+The application will allow the user to view photos of cats using the Imgur API: https://api.imgur.com/

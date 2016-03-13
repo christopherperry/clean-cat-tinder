@@ -50,4 +50,7 @@ dependencies {
     // RxJava for functional-reactive programming
     compile 'io.reactivex:rxandroid:1.1.0'
 
+    // Retrofit 2 for easy REST calls
+    compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
 }
