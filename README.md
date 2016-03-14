@@ -21,6 +21,9 @@ an appropriate View Model for a particular use case. It then passes it along to 
 The View in this description is some Interface that is implemented by an Activity, Fragment, or Android View.
 Note that the Presenter houses all the logic, and that the View implementations are "dumb".
 
+Since the View is manipulated through an interface it allows UI to change without effecting the code
+below it. Presenters with the same business rules, but different UI can be swapped with minimal code changes.
+
 ## The Domain Layer
 This layer houses the business objects of the application. These are POJOs and are not effected by
 the Use Cases. Objects in this layer could be shared across the enterprise.
@@ -28,7 +31,8 @@ the Use Cases. Objects in this layer could be shared across the enterprise.
 ## The Data Layer
 The Data Layer uses the Repository Pattern to abstract the source of data. Data could come from a disk/memory cache,
 from the cloud, from a database, etc. The point is, the user of the repository need not know where the data comes
-from. Where it comes from is an implementation detail of a Repository implementation.
+from. Where it comes from is an implementation detail of a Repository implementation. The Interactors are implemented
+ at this level of abstraction.
 
 ## Directory Structure
 
@@ -39,4 +43,11 @@ involved in creating the application.
 
 ## Implementation Details
 
-The application will allow the user to view photos of cats using the Imgur API: https://api.imgur.com/
+The application will allow the user to view photos of cats using one of several services. The MainActivity contains
+several buttons which allow the user to make the choice. After a choice is made the user is presented with a
+Tinder-esque Activity that allows them to like / dislike cat images.
+
+The Presentation layer of the application does not change when the user selects a service to view images from. The
+same View and Presenter implementations are used, and Inversion of Control is accomplished via dependency injection.
+Depending on which service the user chooses an implementation of an Interactor is chosen, and passed along to the
+presenter for use.
