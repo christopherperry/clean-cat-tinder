@@ -23,7 +23,7 @@ import timber.log.Timber;
  *
  * Also, we can change the presentation by passing in different implementations of the View.
  */
-public class CatLikePresenterImpl implements CatLikePresenter {
+class CatLikePresenterImpl implements CatLikePresenter {
 
     private final CatCardsView catCardsView;
     private final CatLikeInteractor mCatLikeInteractor;
