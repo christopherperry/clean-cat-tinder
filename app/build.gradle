@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId "com.github.cleancattinder"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
     }
@@ -47,10 +47,22 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.2.1'
     compile 'com.android.support:design:23.2.1'
 
+    // Timber for distributed logging
+    compile 'com.jakewharton.timber:timber:4.1.1'
+
     // RxJava for functional-reactive programming
     compile 'io.reactivex:rxandroid:1.1.0'
 
     // Retrofit 2 for easy REST calls
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
+
+    // Picasso for easy image loading / caching
+    compile 'com.squareup.picasso:picasso:2.5.2'
+
+    // Butterknife to remove findViewById and click listener boilerplate
+    compile 'com.jakewharton:butterknife:7.0.1'
+
+    // Swipe Cards UI Lib for Tinder-like cards you can swipe
+    compile 'com.lorentzos.swipecards:library:1.0.8@aar'
 }

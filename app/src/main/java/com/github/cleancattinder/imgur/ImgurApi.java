@@ -1,44 +1,27 @@
 package com.github.cleancattinder.imgur;
 
-import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
+import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.Path;
+import retrofit2.http.QueryMap;
 
-public class ImgurApi {
-    private static final String BASE_URL = "https://api.imgur.com/3/";
-    private final CatService catService;
+public interface ImgurApi {
 
-    public ImgurApi() {
-        Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
+    /**
+     * Try gallery search:
+     * https://api.imgur.com/endpoints/gallery#gallery-search
+     *
+     * See here for sizing the thumbnails when you request them:
+     * https://api.imgur.com/models/gallery_image
+     */
+    @Headers("Authorization: Client-ID 8931400a0875247")
+    @GET("gallery/search/viral/{page}/search")
+    Call<ImgurGalleryResponse> gallerySearch(@Path("page") int page, @QueryMap Map<String, String> queryMap);
 
-        catService = retrofit.create(CatService.class);
-    }
-
-    public Observable<List<ImgurCat>> getCats() {
-        return Observable.create(subscriber -> {
-            try {
-                final Call<List<ImgurCat>> call = catService.getCats();
-                final Response<List<ImgurCat>> response = call.execute();
-                if (response.isSuccess()) {
-                    subscriber.onNext(response.body());
-                    subscriber.onCompleted();
-                } else {
-                    subscriber.onError(new Exception("Failed to get cats"));
-                }
-            }
-            catch (IOException e) {
-                subscriber.onError(new Exception("Failed to get cats", e));
-            }
-        });
-
-
-    }
+    @Headers("Authorization: Client-ID 8931400a0875247")
+    @GET("image/{id}")
+    Call<ImgurGalleryResponse> getImage(@Path("id") int id);
 }
