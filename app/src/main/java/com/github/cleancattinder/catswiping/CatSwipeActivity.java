@@ -1,11 +1,11 @@
 package com.github.cleancattinder.catswiping;
 
 import com.github.cleancattinder.R;
-import com.github.cleancattinder.catswiping.presenter.CatSwipePresenter;
-import com.github.cleancattinder.catswiping.presenter.CatSwipePresenterImpl;
+import com.github.cleancattinder.catswiping.interactor.imgur.ImgurCatLikeInteractor;
+import com.github.cleancattinder.catswiping.presenter.CatLikePresenter;
+import com.github.cleancattinder.catswiping.presenter.CatLikePresenterImpl;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
 import com.github.cleancattinder.catswiping.view.CatCardsView;
-import com.github.cleancattinder.catswiping.interactor.imgur.ImgurCatSwipeInteractor;
 import com.github.cleancattinder.imgur.ImgurService;
 import com.github.cleancattinder.rx.SchedulerFactoryImpl;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
@@ -29,12 +29,12 @@ import timber.log.Timber;
 public class CatSwipeActivity extends AppCompatActivity implements CatCardsView, SwipeFlingAdapterView.onFlingListener {
     @Bind(R.id.catSwipeView) SwipeFlingAdapterView catSwipeView;
 
-    private CatSwipePresenter catSwipePresenter;
+    private CatLikePresenter mCatLikePresenter;
     private CatSwipeAdapter catSwipeAdapter;
 
     // TODO: replace with Dagger
     void inject() {
-        catSwipePresenter = new CatSwipePresenterImpl(this, new ImgurCatSwipeInteractor(new ImgurService()), new
+        mCatLikePresenter = new CatLikePresenterImpl(this, new ImgurCatLikeInteractor(new ImgurService()), new
             SchedulerFactoryImpl());
     }
 
@@ -85,18 +85,20 @@ public class CatSwipeActivity extends AppCompatActivity implements CatCardsView,
 
     @Override
     public void onLeftCardExit(Object o) {
-//        catSwipePresenter.onCatDisliked();
+        CatCardInfo catCardInfo = (CatCardInfo)o;
+        mCatLikePresenter.onCatDisliked(catCardInfo.id);
     }
 
     @Override
     public void onRightCardExit(Object o) {
-//        catSwipePresenter.onCatLiked();
+        CatCardInfo catCardInfo = (CatCardInfo)o;
+        mCatLikePresenter.onCatLiked(catCardInfo.id);
     }
 
     @Override
     public void onAdapterAboutToEmpty(int i) {
         Timber.d("Adapter about to empty, loading more cats!");
-        catSwipePresenter.loadCats();
+        mCatLikePresenter.loadCats();
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.github.cleancattinder.catswiping.interactor.imgur;
 
-import com.github.cleancattinder.catswiping.interactor.CatSwipeInteractor;
+import com.github.cleancattinder.catswiping.interactor.CatLikeInteractor;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
 import com.github.cleancattinder.imgur.ImgurGalleryItem;
 import com.github.cleancattinder.imgur.ImgurGalleryResponse;
@@ -20,12 +20,12 @@ import rx.functions.Func1;
  * down on responses that represent albums in order to get an image to show,
  * we filter out albums from the response. We can add these in later.
  */
-public class ImgurCatSwipeInteractor implements CatSwipeInteractor {
+public class ImgurCatLikeInteractor implements CatLikeInteractor {
 
     private final ImgurService imgurService;
     private final Map<String, String> queryParams;
 
-    public ImgurCatSwipeInteractor(ImgurService imgurService) {
+    public ImgurCatLikeInteractor(ImgurService imgurService) {
         this.imgurService = imgurService;
         this.queryParams = new HashMap<>();
         this.queryParams.put("q", "title: cats ext: jpg OR png");

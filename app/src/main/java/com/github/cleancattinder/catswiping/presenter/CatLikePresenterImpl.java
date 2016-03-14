@@ -1,7 +1,7 @@
 package com.github.cleancattinder.catswiping.presenter;
 
 
-import com.github.cleancattinder.catswiping.interactor.CatSwipeInteractor;
+import com.github.cleancattinder.catswiping.interactor.CatLikeInteractor;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
 import com.github.cleancattinder.catswiping.view.CatCardsView;
 import com.github.cleancattinder.pagination.IntPaginator;
@@ -10,24 +10,30 @@ import com.github.cleancattinder.rx.SchedulerFactory;
 import java.util.List;
 
 import rx.Subscriber;
-import rx.functions.Action0;
 import timber.log.Timber;
 
 /**
  * Contains the business logic around loading, liking, and disliking cats.
+ *
  * Note that we are referencing interfaces here NOT implementations.
+ *
+ * This means I can reuse this class and pass in different implementations of
+ * the CatLikeInteractor to change the way data is obtained. The presenter, and the view
+ * are agnostic when it comes to knowing where the data comes from.
+ *
+ * Also, we can change the presentation by passing in different implementations of the View.
  */
-public class CatSwipePresenterImpl implements CatSwipePresenter {
+public class CatLikePresenterImpl implements CatLikePresenter {
 
     private final CatCardsView catCardsView;
-    private final CatSwipeInteractor catSwipeInteractor;
+    private final CatLikeInteractor mCatLikeInteractor;
     private final SchedulerFactory schedulers;
     private final IntPaginator paginator;
 
-    public CatSwipePresenterImpl(CatCardsView catCardsView, CatSwipeInteractor catSwipeInteractor, SchedulerFactory
+    public CatLikePresenterImpl(CatCardsView catCardsView, CatLikeInteractor catLikeInteractor, SchedulerFactory
         schedulers) {
         this.catCardsView = catCardsView;
-        this.catSwipeInteractor = catSwipeInteractor;
+        this.mCatLikeInteractor = catLikeInteractor;
         this.schedulers = schedulers;
         this.paginator = new IntPaginator(/* startPage */ 1, /* pageStep */ 1);
     }
@@ -35,7 +41,7 @@ public class CatSwipePresenterImpl implements CatSwipePresenter {
     @Override
     public void loadCats() {
         Timber.d("Loading cats...");
-        catSwipeInteractor.getCats(paginator.getNextPage())
+        mCatLikeInteractor.getCats(paginator.getNextPage())
                           .subscribeOn(schedulers.io())
                           .observeOn(schedulers.mainThread())
                           .subscribe(new Subscriber<List<CatCardInfo>>() {
@@ -58,11 +64,11 @@ public class CatSwipePresenterImpl implements CatSwipePresenter {
 
     @Override
     public void onCatLiked(String id) {
-        catSwipeInteractor.likeCat(id);
+        mCatLikeInteractor.likeCat(id);
     }
 
     @Override
     public void onCatDisliked(String id) {
-        catSwipeInteractor.dislikeCat(id);
+        mCatLikeInteractor.dislikeCat(id);
     }
 }

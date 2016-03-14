@@ -10,7 +10,7 @@ package com.github.cleancattinder.catswiping.presenter;
  * 2. User should be able to like a cat
  * 3. User should be able to dislike a cat
  */
-public interface CatSwipePresenter {
+public interface CatLikePresenter {
 
     void loadCats();
 

@@ -6,7 +6,7 @@ import java.util.List;
 
 import rx.Observable;
 
-public interface CatSwipeInteractor {
+public interface CatLikeInteractor {
 
     Observable<List<CatCardInfo>> getCats(int page);
 
