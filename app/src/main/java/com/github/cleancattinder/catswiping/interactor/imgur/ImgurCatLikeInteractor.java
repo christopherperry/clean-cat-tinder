@@ -2,9 +2,10 @@ package com.github.cleancattinder.catswiping.interactor.imgur;
 
 import com.github.cleancattinder.catswiping.interactor.CatLikeInteractor;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
-import com.github.cleancattinder.imgur.ImgurGalleryItem;
-import com.github.cleancattinder.imgur.ImgurGalleryResponse;
-import com.github.cleancattinder.imgur.ImgurService;
+import com.github.cleancattinder.imageservice.imgur.ImgurGalleryItem;
+import com.github.cleancattinder.imageservice.imgur.ImgurGalleryResponse;
+import com.github.cleancattinder.imageservice.imgur.ImgurService;
+import com.github.cleancattinder.pagination.IntPaginator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,16 +25,18 @@ public class ImgurCatLikeInteractor implements CatLikeInteractor {
 
     private final ImgurService imgurService;
     private final Map<String, String> queryParams;
+    private final IntPaginator paginator;
 
     public ImgurCatLikeInteractor(ImgurService imgurService) {
         this.imgurService = imgurService;
         this.queryParams = new HashMap<>();
         this.queryParams.put("q", "title: cats ext: jpg OR png");
+        this.paginator = new IntPaginator(/* startPage */ 1, /* pageStep */ 1);
     }
 
     @Override
-    public Observable<List<CatCardInfo>> getCats(int page) {
-        return imgurService.gallerySearch(page, queryParams)
+    public Observable<List<CatCardInfo>> getCats() {
+        return imgurService.gallerySearch(paginator.getNextPage(), queryParams)
                            .flatMap(toGalleryItemObservable)
                            .filter(removeIfAlbum)
                            .map(toCatCardInfo)
@@ -54,11 +57,11 @@ public class ImgurCatLikeInteractor implements CatLikeInteractor {
     // Mapping Functions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private Func1<ImgurGalleryItem, CatCardInfo> toCatCardInfo =
-        imgurGalleryItem -> new CatCardInfo(imgurGalleryItem.id, imgurGalleryItem.link, imgurGalleryItem.title);
-
     private Func1<ImgurGalleryResponse, Observable<ImgurGalleryItem>> toGalleryItemObservable =
         imgurGallerySearchResponse -> Observable.from(imgurGallerySearchResponse.data);
+
+    private Func1<ImgurGalleryItem, CatCardInfo> toCatCardInfo =
+        imgurGalleryItem -> new CatCardInfo(imgurGalleryItem.id, imgurGalleryItem.link, imgurGalleryItem.title);
 
     private Func1<ImgurGalleryItem, Boolean> removeIfAlbum = imgurGalleryItem -> !imgurGalleryItem.is_album;
 

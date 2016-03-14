@@ -1,12 +1,14 @@
 package com.github.cleancattinder.catswiping;
 
 import com.github.cleancattinder.R;
+import com.github.cleancattinder.catswiping.interactor.google.GoogleCatLikeInteractor;
 import com.github.cleancattinder.catswiping.interactor.imgur.ImgurCatLikeInteractor;
 import com.github.cleancattinder.catswiping.presenter.CatLikePresenter;
 import com.github.cleancattinder.catswiping.presenter.CatLikePresenterImpl;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
 import com.github.cleancattinder.catswiping.view.CatCardsView;
-import com.github.cleancattinder.imgur.ImgurService;
+import com.github.cleancattinder.imageservice.google.GoogleService;
+import com.github.cleancattinder.imageservice.imgur.ImgurService;
 import com.github.cleancattinder.rx.SchedulerFactoryImpl;
 import com.lorentzos.flingswipe.SwipeFlingAdapterView;
 import com.squareup.picasso.Picasso;
@@ -29,12 +31,15 @@ import timber.log.Timber;
 public class CatSwipeActivity extends AppCompatActivity implements CatCardsView, SwipeFlingAdapterView.onFlingListener {
     @Bind(R.id.catSwipeView) SwipeFlingAdapterView catSwipeView;
 
-    private CatLikePresenter mCatLikePresenter;
+    private CatLikePresenter catLikePresenter;
     private CatSwipeAdapter catSwipeAdapter;
 
     // TODO: replace with Dagger
     void inject() {
-        mCatLikePresenter = new CatLikePresenterImpl(this, new ImgurCatLikeInteractor(new ImgurService()), new
+//        catLikePresenter = new CatLikePresenterImpl(this, new ImgurCatLikeInteractor(new ImgurService()), new
+//            SchedulerFactoryImpl());
+
+        catLikePresenter = new CatLikePresenterImpl(this, new GoogleCatLikeInteractor(new GoogleService()), new
             SchedulerFactoryImpl());
     }
 
@@ -86,19 +91,19 @@ public class CatSwipeActivity extends AppCompatActivity implements CatCardsView,
     @Override
     public void onLeftCardExit(Object o) {
         CatCardInfo catCardInfo = (CatCardInfo)o;
-        mCatLikePresenter.onCatDisliked(catCardInfo.id);
+        catLikePresenter.onCatDisliked(catCardInfo.id);
     }
 
     @Override
     public void onRightCardExit(Object o) {
         CatCardInfo catCardInfo = (CatCardInfo)o;
-        mCatLikePresenter.onCatLiked(catCardInfo.id);
+        catLikePresenter.onCatLiked(catCardInfo.id);
     }
 
     @Override
     public void onAdapterAboutToEmpty(int i) {
         Timber.d("Adapter about to empty, loading more cats!");
-        mCatLikePresenter.loadCats();
+        catLikePresenter.loadCats();
     }
 
     @Override

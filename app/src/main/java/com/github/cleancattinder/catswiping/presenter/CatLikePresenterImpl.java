@@ -28,20 +28,19 @@ public class CatLikePresenterImpl implements CatLikePresenter {
     private final CatCardsView catCardsView;
     private final CatLikeInteractor mCatLikeInteractor;
     private final SchedulerFactory schedulers;
-    private final IntPaginator paginator;
 
     public CatLikePresenterImpl(CatCardsView catCardsView, CatLikeInteractor catLikeInteractor, SchedulerFactory
         schedulers) {
         this.catCardsView = catCardsView;
         this.mCatLikeInteractor = catLikeInteractor;
         this.schedulers = schedulers;
-        this.paginator = new IntPaginator(/* startPage */ 1, /* pageStep */ 1);
+
     }
 
     @Override
     public void loadCats() {
         Timber.d("Loading cats...");
-        mCatLikeInteractor.getCats(paginator.getNextPage())
+        mCatLikeInteractor.getCats()
                           .subscribeOn(schedulers.io())
                           .observeOn(schedulers.mainThread())
                           .subscribe(new Subscriber<List<CatCardInfo>>() {

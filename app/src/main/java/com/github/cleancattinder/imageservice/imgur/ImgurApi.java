@@ -1,4 +1,4 @@
-package com.github.cleancattinder.imgur;
+package com.github.cleancattinder.imageservice.imgur;
 
 import java.util.Map;
 
@@ -8,7 +8,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.QueryMap;
 
-public interface ImgurApi {
+interface ImgurApi {
 
     /**
      * Try gallery search:

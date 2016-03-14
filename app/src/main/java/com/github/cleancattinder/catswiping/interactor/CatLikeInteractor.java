@@ -8,7 +8,7 @@ import rx.Observable;
 
 public interface CatLikeInteractor {
 
-    Observable<List<CatCardInfo>> getCats(int page);
+    Observable<List<CatCardInfo>> getCats();
 
     void likeCat(String id);
 

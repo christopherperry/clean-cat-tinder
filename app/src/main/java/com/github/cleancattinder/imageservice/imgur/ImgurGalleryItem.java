@@ -1,4 +1,4 @@
-package com.github.cleancattinder.imgur;
+package com.github.cleancattinder.imageservice.imgur;
 
 public class ImgurGalleryItem {
     public String id;
