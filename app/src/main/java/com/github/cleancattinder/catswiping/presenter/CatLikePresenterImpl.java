@@ -4,13 +4,10 @@ package com.github.cleancattinder.catswiping.presenter;
 import com.github.cleancattinder.catswiping.interactor.CatLikeInteractor;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
 import com.github.cleancattinder.catswiping.view.CatCardsView;
-import com.github.cleancattinder.pagination.IntPaginator;
 import com.github.cleancattinder.rx.SchedulerFactory;
+import rx.Subscriber;
 
 import java.util.List;
-
-import rx.Subscriber;
-import timber.log.Timber;
 
 /**
  * Contains the business logic around loading, liking, and disliking cats.
@@ -39,19 +36,18 @@ class CatLikePresenterImpl implements CatLikePresenter {
 
     @Override
     public void loadCats() {
-        Timber.d("Loading cats...");
         mCatLikeInteractor.getCats()
                           .subscribeOn(schedulers.io())
                           .observeOn(schedulers.mainThread())
                           .subscribe(new Subscriber<List<CatCardInfo>>() {
                               @Override
                               public void onCompleted() {
-                                  Timber.d("Done loading cats");
+
                               }
 
                               @Override
                               public void onError(Throwable e) {
-                                  Timber.e(e.getMessage());
+
                               }
 
                               @Override

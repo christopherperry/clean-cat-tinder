@@ -27,14 +27,14 @@ class CatSwipeAdapter extends BaseAdapter {
         this.picasso = picasso;
     }
 
-    public void addCatCards(List<CatCardInfo> catCardInfos) {
+    void addCatCards(List<CatCardInfo> catCardInfos) {
         this.catCardInfos.addAll(catCardInfos);
         if (catCardInfos.size() > 0) {
             notifyDataSetChanged();
         }
     }
 
-    public void removeFirstCatCard() {
+    void removeFirstCatCard() {
         if (getCount() > 0) {
             this.catCardInfos.remove(0);
             notifyDataSetChanged();

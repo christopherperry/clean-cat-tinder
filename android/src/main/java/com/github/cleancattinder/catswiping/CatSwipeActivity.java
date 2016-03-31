@@ -1,25 +1,24 @@
 package com.github.cleancattinder.catswiping;
 
-import com.github.cleancattinder.R;
-import com.github.cleancattinder.catswiping.presenter.CatLikePresenter;
-import com.github.cleancattinder.catswiping.presenter.CatLikePresenterFactory;
-import com.github.cleancattinder.catswiping.view.CatCardInfo;
-import com.github.cleancattinder.catswiping.view.CatCardsView;
-import com.lorentzos.flingswipe.SwipeFlingAdapterView;
-import com.squareup.picasso.Picasso;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import com.github.cleancattinder.R;
+import com.github.cleancattinder.catswiping.presenter.CatLikePresenter;
+import com.github.cleancattinder.catswiping.presenter.CatLikePresenterFactory;
+import com.github.cleancattinder.catswiping.view.CatCardInfo;
+import com.github.cleancattinder.catswiping.view.CatCardsView;
+import com.github.cleancattinder.rx.AndroidSchedulerFactory;
+import com.lorentzos.flingswipe.SwipeFlingAdapterView;
+import com.squareup.picasso.Picasso;
 import timber.log.Timber;
+
+import java.util.List;
 
 /**
  * Allows the user of the application to like/dislike cats by
@@ -60,9 +59,9 @@ public class CatSwipeActivity extends AppCompatActivity implements CatCardsView,
         final int service = intent.getIntExtra(EXTRA_SERVICE_CHOICE, SERVICE_GOOGLE);
         final CatLikePresenterFactory factory = new CatLikePresenterFactory();
         if (service == SERVICE_GOOGLE) {
-            return factory.presentImagesFromGoogle(this);
+            return factory.presentImagesFromGoogle(this, new AndroidSchedulerFactory());
         } else {
-            return factory.presentImagesFromImgur(this);
+            return factory.presentImagesFromImgur(this, new AndroidSchedulerFactory());
         }
     }
 

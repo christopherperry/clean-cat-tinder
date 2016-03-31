@@ -5,23 +5,23 @@ import com.github.cleancattinder.catswiping.interactor.imgur.ImgurCatLikeInterac
 import com.github.cleancattinder.catswiping.view.CatCardsView;
 import com.github.cleancattinder.imageservice.google.GoogleService;
 import com.github.cleancattinder.imageservice.imgur.ImgurService;
-import com.github.cleancattinder.rx.SchedulerFactoryImpl;
+import com.github.cleancattinder.rx.SchedulerFactory;
 
 public class CatLikePresenterFactory {
 
-    public CatLikePresenter presentImagesFromGoogle(CatCardsView view) {
+    public CatLikePresenter presentImagesFromGoogle(CatCardsView view, SchedulerFactory sf) {
         return new CatLikePresenterImpl(
             view,
             new GoogleCatLikeInteractor(new GoogleService()),
-            new SchedulerFactoryImpl()
+            sf
         );
     }
 
-    public CatLikePresenter presentImagesFromImgur(CatCardsView view) {
+    public CatLikePresenter presentImagesFromImgur(CatCardsView view, SchedulerFactory sf) {
         return new CatLikePresenterImpl(
             view,
             new ImgurCatLikeInteractor(new ImgurService()),
-            new SchedulerFactoryImpl()
+            sf
         );
     }
 

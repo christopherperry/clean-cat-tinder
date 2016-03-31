@@ -1,19 +1,13 @@
 package com.github.cleancattinder.rx;
 
 import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import rx.schedulers.SwingScheduler;
 
-/**
- * Hint: Decouple your scheduling from your algorithm!
- *
- * "Objects are abstractions of processing. Threads are abstractions of schedule."
- */
-public class SchedulerFactoryImpl implements SchedulerFactory{
-
+public class DesktopSchedulerFactory implements SchedulerFactory {
     @Override
     public Scheduler mainThread() {
-        return AndroidSchedulers.mainThread();
+        return SwingScheduler.getInstance();
     }
 
     @Override
