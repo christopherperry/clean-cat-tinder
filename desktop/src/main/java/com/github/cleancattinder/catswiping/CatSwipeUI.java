@@ -4,108 +4,96 @@ import com.github.cleancattinder.catswiping.presenter.CatLikePresenter;
 import com.github.cleancattinder.catswiping.presenter.CatLikePresenterFactory;
 import com.github.cleancattinder.catswiping.view.CatCardInfo;
 import com.github.cleancattinder.catswiping.view.CatCardsView;
-import com.github.cleancattinder.rx.DesktopSchedulerFactory;
-import rx.Observable;
-import rx.Subscriber;
+import com.github.cleancattinder.rx.SchedulerFactory;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
-public class CatSwipeUI extends JFrame implements CatCardsView {
-    CardLayout cardLayout = new CardLayout();
-    JPanel mainContainer = new JPanel();
-    JPanel buttonContainer = new JPanel();
-    ImagePanel cardOne = new ImagePanel();
-    ImagePanel cardTwo = new ImagePanel();
-    JPanel cardContainer = new JPanel();
+import javax.swing.*;
 
-    JButton likeButton = new JButton("Like");
-    JButton dislikeButton = new JButton("Dislike");
-    JPanel leftSpacer = new JPanel();
-    JPanel centerSpacer = new JPanel();
-    JPanel rightSpacer = new JPanel();
+public class CatSwipeUI extends JFrame implements CatCardsView, CardFlipAdapter.CardAdapterListener {
 
-    JPanel currentCard = cardOne;
+    private final CatLikePresenter presenter;
+    private final CardFlipper cardFlipper;
+    private final CardFlipAdapter adapter;
 
-    private final List<CatCardInfo> catCardInfos = new ArrayList<>();
-    private CatLikePresenter presenter;
     private boolean hasShownFirstCat;
 
-    private CatSwipeUI() {
+    public CatSwipeUI(boolean isGoogle, SchedulerFactory schedulerFactory) {
         super("Cat Tinder");
         setPreferredSize(new Dimension(600, 600));
-        presenter = new CatLikePresenterFactory().presentImagesFromGoogle(this, new DesktopSchedulerFactory());
+        this.presenter = createPresenter(isGoogle, schedulerFactory);
 
-        presenter.loadCats();
-        setupButtons();
+        cardFlipper = new CardFlipper();
+        adapter = new CardFlipAdapter(schedulerFactory, this);
+        cardFlipper.setAdapter(adapter);
     }
 
-    void addComponentsToPane(Container container) {
+    CatLikePresenter createPresenter(boolean isGoogle, SchedulerFactory schedulerFactory) {
+        if (isGoogle) {
+            return new CatLikePresenterFactory().presentImagesFromGoogle(this, schedulerFactory);
+        }
+        return new CatLikePresenterFactory().presentImagesFromImgur(this, schedulerFactory);
+    }
+
+    public void load() {
+        presenter.loadCats();
+    }
+
+    public void addComponentsToPane(Container container) {
+        JPanel mainContainer = new JPanel();
         mainContainer.setLayout(new BorderLayout());
 
-        setupCards();
-        setupButtons();
+        addCardLayout(mainContainer);
+        addButtons(mainContainer);
 
         container.add(mainContainer);
     }
 
-    private void setupCards() {
-        cardContainer.setLayout(cardLayout);
-        cardContainer.add(cardOne);
-        cardContainer.add(cardTwo);
-        mainContainer.add(cardContainer, BorderLayout.CENTER);
+    private void addCardLayout(JPanel mainContainer) {
+
+        final JPanel middlePanel = new JPanel(new GridLayout(3, 1));
+        middlePanel.add(new JPanel());
+        middlePanel.add(cardFlipper);
+        middlePanel.add(new JPanel());
+
+        JPanel topContainer = new JPanel(new GridLayout(1, 3));
+        topContainer.add(new JPanel());
+        topContainer.add(middlePanel);
+        topContainer.add(new JPanel());
+
+        mainContainer.add(topContainer, BorderLayout.CENTER);
     }
 
-    private void setupButtons() {
-        buttonContainer.setLayout(new GridLayout());
-        buttonContainer.add(leftSpacer);
-        buttonContainer.add(dislikeButton);
-        buttonContainer.add(centerSpacer);
-        buttonContainer.add(likeButton);
-        buttonContainer.add(rightSpacer);
+    private void addButtons(JPanel mainContainer) {
+        JPanel buttonContainer = new JPanel(new GridLayout(1, 5));
 
-        likeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCatRemoved();
-                cardLayout.next(cardContainer);
-                if (catCardInfos.size() > 0) {
-                    loadNextCard(catCardInfos.get(0).imageUrl);
-                }
-            }
+        JButton likeButton = new JButton("Like");
+        JButton dislikeButton = new JButton("Dislike");
+
+        buttonContainer.add(new JPanel());
+        buttonContainer.add(dislikeButton);
+        buttonContainer.add(new JPanel());
+        buttonContainer.add(likeButton);
+        buttonContainer.add(new JPanel());
+
+        likeButton.addActionListener(e -> {
+            System.out.println("Like button clicked");
+            cardFlipper.showNext();
         });
 
-        dislikeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                onCatRemoved();
-                cardLayout.next(cardContainer);
-                if (catCardInfos.size() > 0) {
-                    loadNextCard(catCardInfos.get(0).imageUrl);
-                }
-            }
+        dislikeButton.addActionListener(e -> {
+            System.out.println("Dislike button clicked");
+            cardFlipper.showNext();
         });
 
         // adds the buttons to the bottom
         mainContainer.add(buttonContainer, BorderLayout.SOUTH);
     }
 
-    private void onCatRemoved() {
-        int numCats = catCardInfos.size();
-        if (numCats > 0) {
-            catCardInfos.remove(0);
-        }
-
-        if (numCats < 3) {
-            onCatsAboutToEmpty();
-        }
-    }
-
-    private void onCatsAboutToEmpty() {
+    @Override
+    public void onAdapterAboutToEmpty() {
+        System.out.println("onAdapterAboutToEmpty(), loading more cats");
         presenter.loadCats();
     }
 
@@ -114,71 +102,12 @@ public class CatSwipeUI extends JFrame implements CatCardsView {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Override
     public void addCards(List<CatCardInfo> catCardInfos) {
-        this.catCardInfos.addAll(catCardInfos);
+        System.out.println("Got more cats!");
+        adapter.addCards(catCardInfos);
         if (!hasShownFirstCat) {
+            System.out.println("Haven't shown first cat yet. Loading next card");
             hasShownFirstCat = true;
-            loadNextCard(this.catCardInfos.get(0).imageUrl);
-        }
-    }
-
-    void loadNextCard(final String path) {
-        rx.Observable.create(new Observable.OnSubscribe<Image>() {
-            @Override
-            public void call(Subscriber<? super Image> subscriber) {
-                try {
-                    Image image = Toolkit.getDefaultToolkit().getImage(new URL(path));
-                    subscriber.onNext(image);
-                    subscriber.onCompleted();
-                } catch (MalformedURLException e) {
-                    subscriber.onError(e);
-                }
-            }
-        }).subscribe(image -> {
-            populateNextCard(image);
-        });
-    }
-
-    void populateNextCard(Image image) {
-        if (currentCard == cardOne) {
-            // load next photo into cardOne
-            cardOne.setImage(image);
-            currentCard = cardTwo;
-        } else {
-            // load next photo into cardTwo
-            cardTwo.setImage(image);
-            currentCard = cardOne;
-        }
-    }
-
-    // Quick hack to get the UI up and running
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                CatSwipeUI frame = new CatSwipeUI();
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                //Set up the content pane.
-                frame.addComponentsToPane(frame.getContentPane());
-                //Display the window.
-                frame.pack();
-                frame.setVisible(true);
-            }
-        });
-    }
-
-    static class ImagePanel extends JPanel {
-
-        Image image;
-
-        public void setImage(Image image) {
-            this.image = image;
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (image != null) {
-                Insets insets = getInsets();
-                g.drawImage(image, insets.left, insets.top, this);
-            }
+            cardFlipper.showFirst();
         }
     }
 }
